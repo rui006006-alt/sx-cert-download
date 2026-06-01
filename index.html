@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>陕西省建设类证书下载</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            padding-top: 40px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 22px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 13px;
+        }
+        
+        .cert-type-group {
+            margin-bottom: 20px;
+        }
+        
+        .cert-type-label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .cert-type-options {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .cert-type-option {
+            flex: 1;
+            min-width: 90px;
+            padding: 10px 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            font-size: 14px;
+        }
+        
+        .cert-type-option:hover {
+            border-color: #667eea;
+        }
+        
+        .cert-type-option.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result {
+            margin-top: 25px;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .cert-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .cert-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .cert-info {
+            margin-bottom: 12px;
+        }
+        
+        .cert-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 13px;
+        }
+        
+        .cert-info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .cert-label {
+            color: #666;
+        }
+        
+        .cert-value {
+            color: #333;
+            font-weight: 500;
+            text-align: right;
+            flex: 1;
+            margin-left: 10px;
+            word-break: break-all;
+        }
+        
+        .download-btns {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .download-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+        
+        .download-btn.pdf {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .download-btn.ofd {
+            background: #3498db;
+            color: white;
+        }
+        
+        .download-btn.img {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .download-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: none;
+            font-size: 13px;
+        }
+        
+        .error.show {
+            display: block;
+        }
+        
+        .tips {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 0 10px 10px 0;
+            font-size: 12px;
+            color: #555;
+        }
+        
+        .tips-title {
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 5px;
+        }
+        
+        /* 移动端适配 */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+                padding-top: 20px;
+            }
+            
+            .container {
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .cert-type-option {
+                min-width: 70px;
+                padding: 8px 5px;
+                font-size: 12px;
+            }
+            
+            .cert-info-row {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>陕西省建设类证书下载</h1>
+        <p class="subtitle">特种作业 | 三类人员 | 二级建造师</p>
+        
+        <div class="cert-type-group">
+            <label class="cert-type-label">选择证书类型</label>
+            <div class="cert-type-options">
+                <div class="cert-type-option active" data-type="C005" data-desc="特种作业操作资格证书" data-tbl="a050">
+                    特种作业
+                </div>
+                <div class="cert-type-option" data-type="C004" data-desc="三类人员安全生产考核合格证书" data-tbl="a040">
+                    三类人员
+                </div>
+                <div class="cert-type-option" data-type="C001" data-desc="二级建造师注册证书" data-tbl="a001">
+                    二级建造师
+                </div>
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label for="idCard">身份证号码</label>
+            <input type="text" id="idCard" placeholder="请输入18位身份证号码" maxlength="18">
+        </div>
+        
+        <button class="btn" id="searchBtn" onclick="searchCert()">查询证书</button>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>正在查询...</p>
+        </div>
+        
+        <div class="error" id="error"></div>
+        
+        <div class="result" id="result"></div>
+        
+        <div class="tips">
+            <div class="tips-title">使用说明</div>
+            <p>1. 选择证书类型，输入身份证号查询</p>
+            <p>2. 如提示Token过期，需从官网获取最新Token</p>
+        </div>
+    </div>
+
+    <script>
+        // API基础地址
+        const BASE_URL = 'https://baoming1.zhitaosoft.com';
+        
+        // Token - 需要从官网获取最新的
+        let TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ6dHNvZnQiLCJleHAiOjE3ODAzMTI5MTYsInN1YiI6IlBUTUlTSldUIiwiYXVkIjoienRzb2Z0IiwiaWF0IjoiMjAyNi82LzEgMTc6MjE6NTYiLCJkYXRhIjp7InpqIjoiIiwiZGFoIjoiIiwidG1pZCI6IiIsInR5cGUiOiIiLCJuYW1lIjoiIiwic2Z6aCI6IiIsImV4YW1zb3J0IjoiIiwiZXhhbWRhdGUiOiIiLCJqeW1pbWciOiI1OTUzIiwiaG9zdCI6IiIsImp5bXNtcyI6IiIsInFoYm0iOiIifX0.3_J7Uec3bK3kOTXW10GeZ8hP49scSNSE3xHSzjbPJas';
+        
+        // 验证码 - 需要从官网获取最新的
+        let IMG_JYM = '5953';
+        
+        // 当前选中的证书类型
+        let currentCertType = {
+            type: 'C005',
+            desc: '特种作业操作资格证书',
+            tbl: 'a050'
+        };
+        
+        // 证书类型选择
+        document.querySelectorAll('.cert-type-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.cert-type-option').forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+                currentCertType = {
+                    type: this.dataset.type,
+                    desc: this.dataset.desc,
+                    tbl: this.dataset.tbl
+                };
+            });
+        });
+        
+        // 监听回车键
+        document.getElementById('idCard').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchCert();
+            }
+        });
+        
+        async function searchCert() {
+            const idCard = document.getElementById('idCard').value.trim();
+            
+            // 验证身份证号
+            if (!idCard || idCard.length !== 18) {
+                showError('请输入正确的18位身份证号码');
+                return;
+            }
+            
+            // 清除之前的错误和结果
+            hideError();
+            hideResult();
+            
+            // 显示加载状态
+            showLoading();
+            document.getElementById('searchBtn').disabled = true;
+            
+            try {
+                // 第一步：查询证书列表
+                const searchData = {
+                    token: TOKEN,
+                    description: currentCertType.desc,
+                    type: currentCertType.type,
+                    zslx: "",
+                    fieldname: "sfzh",
+                    fieldvalue: idCard,
+                    imgjym: IMG_JYM
+                };
+                
+                console.log('查询参数:', searchData);
+                
+                const listResponse = await fetch(`${BASE_URL}/DzzzSX/search_certListGR`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json, text/plain, */*',
+                        'Origin': 'https://baoming1.zhitaosoft.com',
+                        'Referer': 'https://baoming1.zhitaosoft.com/'
+                    },
+                    mode: 'cors',
+                    credentials: 'omit',
+                    body: JSON.stringify(searchData)
+                });
+                
+                if (!listResponse.ok) {
+                    throw new Error(`HTTP错误: ${listResponse.status} ${listResponse.statusText}`);
+                }
+                
+                const listData = await listResponse.json();
+                console.log('列表查询结果:', listData);
+                
+                if (listData.code !== 200) {
+                    throw new Error(`查询失败: ${listData.msg || '未知错误'}`);
+                }
+                
+                // data 可能是空字符串、空数组或 undefined
+                if (!listData.data || listData.data === '' || (Array.isArray(listData.data) && listData.data.length === 0)) {
+                    throw new Error(`未找到该身份证对应的${currentCertType.desc}信息 (Token或验证码可能已过期)`);
+                }
+                
+                // 获取第一个证书
+                const cert = listData.data[0];
+                console.log('证书列表第一项:', cert);
+                
+                // 第二步：获取证书详情（包含PDF下载链接）
+                const detailData = {
+                    a0100: cert.a0100,
+                    tablename: cert.tbl || currentCertType.tbl,
+                    token: TOKEN
+                };
+                
+                console.log('详情查询参数:', detailData);
+                
+                const detailResponse = await fetch(`${BASE_URL}/DzzzSX/getCertDetail`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json, text/plain, */*',
+                        'Origin': 'https://baoming1.zhitaosoft.com',
+                        'Referer': 'https://baoming1.zhitaosoft.com/'
+                    },
+                    mode: 'cors',
+                    credentials: 'omit',
+                    body: JSON.stringify(detailData)
+                });
+                
+                if (!detailResponse.ok) {
+                    throw new Error(`HTTP错误: ${detailResponse.status} ${detailResponse.statusText}`);
+                }
+                
+                const detailResult = await detailResponse.json();
+                console.log('详情查询结果:', detailResult);
+                
+                if (detailResult.code !== 200) {
+                    throw new Error(`获取证书详情失败: ${detailResult.msg || '未知错误'}`);
+                }
+                
+                if (!detailResult.data) {
+                    throw new Error('获取证书详情失败: 无数据返回');
+                }
+                
+                // data 是数组，取第一个元素
+                const certDetail = Array.isArray(detailResult.data) ? detailResult.data[0] : detailResult.data;
+                
+                // 显示结果
+                showResult(cert, certDetail, currentCertType);
+                
+            } catch (error) {
+                console.error('查询错误:', error);
+                showError(error.message || '查询失败，请检查网络连接或稍后重试');
+            } finally {
+                hideLoading();
+                document.getElementById('searchBtn').disabled = false;
+            }
+        }
+        
+        function showResult(cert, detail, certType) {
+            const resultDiv = document.getElementById('result');
+            
+            // 提取下载链接（移除可能的反引号）
+            const cleanUrl = (url) => {
+                if (!url) return '';
+                return url.replace(/`/g, '').trim();
+            };
+            
+            // 调试：在控制台输出返回的数据
+            console.log('证书详情数据:', detail);
+            console.log('所有字段:', Object.keys(detail));
+            
+            // 尝试所有可能的字段名
+            const pdfUrl = cleanUrl(detail.zspdf || detail.zsPdf || detail['zsPdf'] || detail['zspdf']);
+            const ofdUrl = cleanUrl(detail.zsofd || detail.zsOfd || detail['zsOfd'] || detail['zsofd'] || cert.zsofd);
+            const imgUrl = cleanUrl(detail.zsimg || detail.zsImg || detail['zsImg'] || detail['zsimg'] || cert.zsimg);
+            
+            let html = `
+                <div class="cert-card">
+                    <div class="cert-title">${certType.desc}</div>
+                    <div class="cert-info">
+                        <div class="cert-info-row">
+                            <span class="cert-label">姓名</span>
+                            <span class="cert-value">${detail['姓名'] || detail.xm || cert.xm || '-'}</span>
+                        </div>
+                        <div class="cert-info-row">
+                            <span class="cert-label">性别</span>
+                            <span class="cert-value">${detail['性别'] || detail.xb || '-'}</span>
+                        </div>
+                        <div class="cert-info-row">
+                            <span class="cert-label">证书编号</span>
+                            <span class="cert-value">${detail['编号'] || detail.yzh || cert.yzh || '-'}</span>
+                        </div>
+            `;
+            
+            // 根据证书类型显示不同字段
+            if (certType.type === 'C005') {
+                // 特种作业
+                html += `
+                        <div class="cert-info-row">
+                            <span class="cert-label">操作类别</span>
+                            <span class="cert-value">${detail['操作类别'] || detail.czlb || detail.zy || cert.zy || '-'}</span>
+                        </div>
+                `;
+            } else if (certType.type === 'C004') {
+                // 三类人员
+                html += `
+                        <div class="cert-info-row">
+                            <span class="cert-label">企业名称</span>
+                            <span class="cert-value">${detail['企业名称'] || detail.qymc || cert.qymc || '-'}</span>
+                        </div>
+                        <div class="cert-info-row">
+                            <span class="cert-label">岗位类型</span>
+                            <span class="cert-value">${detail['岗位类型'] || detail.gwlx || detail.zy || cert.zy || '-'}</span>
+                        </div>
+                `;
+            } else if (certType.type === 'C001') {
+                // 二级建造师
+                html += `
+                        <div class="cert-info-row">
+                            <span class="cert-label">注册编号</span>
+                            <span class="cert-value">${detail['注册编号'] || detail.zcbh || detail.yzh || cert.yzh || '-'}</span>
+                        </div>
+                        <div class="cert-info-row">
+                            <span class="cert-label">注册专业</span>
+                            <span class="cert-value">${detail['注册专业'] || detail.zczy || detail.zy || cert.zy || '-'}</span>
+                        </div>
+                        <div class="cert-info-row">
+                            <span class="cert-label">注册企业</span>
+                            <span class="cert-value">${detail['注册企业'] || detail.zcqy || detail.qymc || cert.qymc || '-'}</span>
+                        </div>
+                `;
+            }
+            
+            // 根据证书类型显示日期字段
+            if (certType.type === 'C001') {
+                // 二级建造师
+                html += `
+                        <div class="cert-info-row">
+                            <span class="cert-label">有效期至</span>
+                            <span class="cert-value">${detail['有效期至'] || detail.yxqz || '-'}</span>
+                        </div>
+                        <div class="cert-info-row">
+                            <span class="cert-label">发证时间</span>
+                            <span class="cert-value">${detail['发证时间'] || detail.fzsj || detail.fzrq || '-'}</span>
+                        </div>
+                `;
+            } else {
+                // 特种作业和三类人员
+                html += `
+                        <div class="cert-info-row">
+                            <span class="cert-label">初次领证日期</span>
+                            <span class="cert-value">${detail['初次领证日期'] || detail.ccfzrq || '-'}</span>
+                        </div>
+                        <div class="cert-info-row">
+                            <span class="cert-label">有效期起</span>
+                            <span class="cert-value">${detail['有效期起'] || detail.yxqq || '-'}</span>
+                        </div>
+                        <div class="cert-info-row">
+                            <span class="cert-label">有效期止</span>
+                            <span class="cert-value">${detail['有效期止'] || detail.yxqz || '-'}</span>
+                        </div>
+                        <div class="cert-info-row">
+                            <span class="cert-label">发证机关</span>
+                            <span class="cert-value">${detail['发证机关'] || detail.fzjg || '-'}</span>
+                        </div>
+                        <div class="cert-info-row">
+                            <span class="cert-label">发证日期</span>
+                            <span class="cert-value">${detail['发证日期'] || detail.fzrq || '-'}</span>
+                        </div>
+                `;
+            }
+            
+            html += `
+                        <div class="cert-info-row">
+                            <span class="cert-label">二维码</span>
+                            <span class="cert-value">${detail.qrcode || detail['qrcode'] || '-'}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="download-btns">
+            `;
+            
+            if (pdfUrl) {
+                html += `<a href="${pdfUrl}" target="_blank" class="download-btn pdf" download>下载 PDF</a>`;
+            }
+            
+            if (ofdUrl) {
+                html += `<a href="${ofdUrl}" target="_blank" class="download-btn ofd" download>下载 OFD</a>`;
+            }
+            
+            if (imgUrl) {
+                html += `<a href="${imgUrl}" target="_blank" class="download-btn img" download>下载图片</a>`;
+            }
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
+            resultDiv.innerHTML = html;
+            resultDiv.classList.add('show');
+        }
+        
+        function showLoading() {
+            document.getElementById('loading').classList.add('show');
+        }
+        
+        function hideLoading() {
+            document.getElementById('loading').classList.remove('show');
+        }
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+        }
+        
+        function hideError() {
+            document.getElementById('error').classList.remove('show');
+        }
+        
+        function hideResult() {
+            document.getElementById('result').classList.remove('show');
+        }
+    </script>
+</body>
+</html>
